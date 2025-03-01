@@ -11,7 +11,6 @@
 - [Deployment Strategy](#deployment-strategy)
 - [Security Considerations](#security-considerations)
 - [Future Enhancements](#future-enhancements)
-- [Project Timeline](#project-timeline)
 
 ## Project Overview
 
