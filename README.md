@@ -677,7 +677,7 @@ flowchart TB
 ```
 
 1. **External Data Sources**
-   - Platform APIs (GitHub, Discord, Slack, Discourse)
+   - Platform APIs (GitHub, Discord, Slack)
    - Webhook events
    - Direct user interactions
 
