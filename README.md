@@ -630,7 +630,7 @@ flowchart TB
         GH["GitHub API"]
         DS["Discord API"]
         SL["Slack API"]
-        DC["Discourse API"]
+        
     end
 
     subgraph "Data Collection Layer"
@@ -656,7 +656,7 @@ flowchart TB
     GH --> WH
     DS --> WH
     SL --> API
-    DC --> API
+    
     
     WH --> NORM
     API --> NORM
@@ -695,65 +695,6 @@ flowchart TB
 
 ### Database Schema Overview
 
-#### Supabase (PostgreSQL) Core Tables
-
-**Users Table**
-```sql
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  external_ids JSONB NOT NULL, -- Platform-specific IDs
-  name TEXT NOT NULL,
-  email TEXT,
-  role TEXT,
-  first_seen_at TIMESTAMPTZ NOT NULL,
-  last_active_at TIMESTAMPTZ NOT NULL,
-  contribution_count INTEGER DEFAULT 0,
-  metadata JSONB
-);
-```
-
-**Projects Table**
-```sql
-CREATE TABLE projects (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  description TEXT,
-  repository_url TEXT,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL,
-  settings JSONB,
-  integrations JSONB
-);
-```
-
-**Conversations Table**
-```sql
-CREATE TABLE conversations (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES users(id),
-  platform TEXT NOT NULL,
-  channel_id TEXT,
-  started_at TIMESTAMPTZ NOT NULL,
-  last_message_at TIMESTAMPTZ NOT NULL,
-  status TEXT NOT NULL,
-  metadata JSONB
-);
-```
-
-**Knowledge Base Table**
-```sql
-CREATE TABLE knowledge_items (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  project_id UUID REFERENCES projects(id),
-  title TEXT NOT NULL,
-  content TEXT NOT NULL,
-  source TEXT,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL,
-  verified BOOLEAN DEFAULT FALSE,
-  tags TEXT[]
-);
-```
 
 ### Vector Storage (Pinecone)
 
@@ -960,31 +901,3 @@ flowchart TB
    - Plugin system for custom integrations
    - Visual workflow builder for custom automations
    - Extended API for third-party extensions
-
-## Project Timeline
-
-### Development Phases
-
-**Phase 1: Foundation (Months 1-2)**
-- Core infrastructure setup
-- Basic integration with GitHub and one communication platform
-- Initial AI service implementation
-- MVP deployment for early testing
-
-**Phase 2: Expansion (Months 3-4)**
-- Additional platform integrations
-- Enhanced knowledge management system
-- Analytics dashboard implementation
-- Extended workflow automation
-
-**Phase 3: Refinement (Months 5-6)**
-- Performance optimization
-- Security hardening
-- UI/UX improvements
-- Documentation completion
-
-**Phase 4: Launch and Scale (Months 7-8)**
-- Beta program with selected open-source projects
-- Feedback collection and implementation
-- Scaling infrastructure for production load
-- Official launch and marketing
