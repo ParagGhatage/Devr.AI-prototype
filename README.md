@@ -9,8 +9,6 @@
 - [Workflows](#workflows)
 - [Data Flow and Storage](#data-flow-and-storage)
 - [Deployment Strategy](#deployment-strategy)
-- [Security Considerations](#security-considerations)
-- [Future Enhancements](#future-enhancements)
 
 ## Project Overview
 
@@ -37,19 +35,23 @@ flowchart TB
         
     end
 
-    subgraph "API Gateway Layer"
+    subgraph "FastAPI backend"
         API["API Gateway"]
-        AUTH["Authentication Service"]
-        RATE["Rate Limiter"]
+        
+    end
+
+    subgraph "Authentication"
+        GitAuth["GitHub Authentication"]
+        SupaAuth["Supabase Authentication"]
     end
 
     subgraph "Core Processing Engine"
         WF["Workflow Orchestrator"]
         Q["Task Queue"]
-        CTX["Context Manager"]
+        
     end
 
-    subgraph "AI Service Layer"
+    subgraph "AI Service Layer (Groq APIs)"
         LLM["LLM Service"]
         KR["Knowledge Retrieval"]
         CODE["Code Understanding"]
@@ -63,10 +65,8 @@ flowchart TB
     end
 
     subgraph "Data Storage Layer"
-        VDB["Vector DB (Pinecone)"]
-        RDB["Relational DB (Supabase)"]
-        DOC["Document Store (MongoDB)"]
-        CACHE["Cache (Redis)"]
+        VDB["Vector DB and Relational DB (SupaBase)"]
+        
     end
 
     subgraph "Analytics Engine"
@@ -85,27 +85,26 @@ flowchart TB
     SLS <--> API
     
 
-    API <--> AUTH
-    API <--> RATE
+    API <--> GitAuth
+    API <--> SupaAuth
+    
     API <--> WF
 
     WF <--> Q
-    WF <--> CTX
+    
     WF <--> LLM
     WF <--> KR
     WF <--> CODE
 
     LLM <--> VDB
     KR <--> VDB
-    KR <--> RDB
-    KR <--> DOC
-    CTX <--> CACHE
+   
 
     WF --> METRICS
     METRICS --> REPORT
     METRICS --> TREND
-    REPORT --> RDB
-    TREND --> RDB
+    REPORT --> VDB
+    TREND --> VDB
 ```
 
 ### High-Level Architecture Overview
@@ -221,24 +220,22 @@ Devr.AI follows a microservices architecture with the following key components:
 - **Messaging Queue**: RabbitMQ
 - **Task Scheduling**: Celery
 
-### AI Components
+### AI Components (Groq APIs)
 
-- **LLM Integration**: OpenAI API (GPT-4) / Anthropic API (Claude)
-- **Embeddings**: OpenAI Ada / Sentence Transformers
-- **Custom Models**: Hugging Face Transformers
+- **LLM Integration**: Strong LLM with reasoning capacity
+- **Embeddings**: Embedding Model
+
 
 ### Data Storage
 
-- **Vector Database**: Pinecone
+- **Vector Database**: Supabase
 - **Relational Database**: Supabase (PostgreSQL)
-- **Document Storage**: MongoDB
-- **Cache Layer**: Redis
+- **Document Storage**: Supabase
 
 ### Frontend Components
 
-- **Admin Dashboard**: Next.js + Tailwind CSS
-- **Developer Portal**: Next.js + Tailwind CSS + TypeScript
-- **Analytics UI**: Next.js + Shadcn
+- **Dashboard**: React.js + Tailwind CSS
+- **Analytics UI**: React.js + Shadcn
 
 ### DevOps & Infrastructure
 
@@ -642,14 +639,12 @@ flowchart TB
         NORM["Data Normalizer"]
         EXTR["Entity Extractor"]
         EMB["Embedding Generator"]
-        ENR["Context Enricher"]
     end
 
     subgraph "Storage Layer"
-        PIN["Pinecone<br>(Vector DB)"]
+        PIN["Supabase<br>(Vector DB)"]
         SUP["Supabase<br>(PostgreSQL)"]
-        MDB["MongoDB<br>(Document Store)"]
-        RDS["Redis<br>(Cache)"]
+        MDB["Supabase<br>(Document Store)"]
     end
 
     GH --> WH
@@ -663,17 +658,14 @@ flowchart TB
     
     NORM --> EXTR
     EXTR --> EMB
-    EXTR --> ENR
+
     
     EMB --> PIN
-    ENR --> SUP
+    EXTR --> SUP
     NORM --> MDB
-    ENR --> RDS
+  
+
     
-    PIN -.-> ENR
-    SUP -.-> ENR
-    MDB -.-> ENR
-    RDS -.-> ENR
 ```
 
 1. **External Data Sources**
@@ -692,31 +684,6 @@ flowchart TB
    - Historical conversations → MongoDB
    - Temporary state → Redis
 
-### Database Schema Overview
-
-
-### Vector Storage (Pinecone)
-
-- **Embeddings Collection**: Stores vector representations of:
-  - Documentation fragments
-  - Code snippets
-  - Conversation history
-  - Issue descriptions
-  - FAQ items
-
-- **Metadata Fields**:
-  - Source type (doc, code, conversation)
-  - Creation timestamp
-  - Last access timestamp
-  - Relevance score
-  - Associated project and component
-
-### Caching Strategy (Redis)
-
-- **Active Conversations**: Maintains context for ongoing interactions
-- **Frequent Queries**: Caches common question/answer pairs
-- **User Session Data**: Stores temporary user context
-- **Rate Limiting**: Tracks API usage per integration
 
 ## Deployment Strategy
 
@@ -816,87 +783,3 @@ flowchart TB
    - Automatic rollback on critical metrics deviation
    - Deployment audit logging
 
-## Security Considerations
-
-### Data Protection
-
-- **Encryption**:
-  - Data encryption at rest (AES-256)
-  - TLS 1.3 for all in-transit communication
-  - Encrypted database backups
-
-- **Data Retention**:
-  - Configurable retention policies per data type
-  - Automated data purging for expired information
-  - Anonymization of historical conversation data
-
-- **Access Control**:
-  - Role-based access control (RBAC)
-  - Principle of least privilege implementation
-  - Regular permission audits
-
-### Platform Security
-
-- **API Security**:
-  - JWT-based authentication
-  - Rate limiting and throttling
-  - Input validation and sanitization
-  - Protection against common OWASP vulnerabilities
-
-- **Integration Security**:
-  - Secure storage of platform credentials
-  - Rotating secrets and tokens
-  - Minimal permission scopes on external platforms
-
-- **Operational Security**:
-  - Regular security scanning and patching
-  - Penetration testing schedule
-  - Security incident response plan
-
-### Privacy Compliance
-
-- **GDPR Considerations**:
-  - User data inventory and classification
-  - Data subject access request (DSAR) handling
-  - Right to be forgotten implementation
-
-- **Transparency Features**:
-  - Clear data usage notifications
-  - AI interaction indicators
-  - Opt-out mechanisms for data collection
-
-## Future Enhancements
-
-### Planned Feature Expansions
-
-1. **Advanced Contributor Matching**
-   - ML-based skill mapping and issue routing
-   - Mentorship pairing based on expertise alignment
-   - Workflow personalization based on contributor preferences
-
-2. **Expanded Platform Integrations**
-   - Twitter/X community monitoring and engagement
-   - Stack Overflow question tracking and answering
-   - YouTube comment moderation for project videos
-
-3. **Enhanced Analytics Capabilities**
-   - Predictive modeling for project trajectory
-   - Contributor churn prevention strategies
-   - Cross-project impact analysis
-
-### Technical Roadmap
-
-1. **AI Capabilities**
-   - Fine-tuned models for specific open-source domains
-   - Multi-modal understanding (code + text + diagrams)
-   - Self-improving response quality through feedback loops
-
-2. **Scalability Improvements**
-   - Multi-region deployment support
-   - Enhanced caching strategies
-   - Optimized database sharding for large communities
-
-3. **Developer Experience**
-   - Plugin system for custom integrations
-   - Visual workflow builder for custom automations
-   - Extended API for third-party extensions
