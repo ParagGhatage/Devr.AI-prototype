@@ -247,7 +247,8 @@ Devr.AI follows a microservices architecture with the following key components:
   - Community sentiment analysis
 
 ## Setup Guide
-You can find detailed setup guide [HERE](https://paragghatage.com).
+For installing the project locally refer to the [Installation Guide](./docs/INSTALL_GUIDE.md)
+
 ## Technology Stack
 
 ### Backend Services
